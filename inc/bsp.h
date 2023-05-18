@@ -1,7 +1,7 @@
 #ifndef BSP_H
 #define BSP_H
 
-//#include "chip.h"
+#include "chip.h"
 #include <stdbool.h>
 #include "digital.h"
 #include <stdint.h>
