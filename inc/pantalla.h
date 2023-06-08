@@ -68,24 +68,19 @@ typedef void(*display_segments_on_t)(uint8_t segments);
 
 typedef void(*display_digit_on_t)(uint8_t digit);
 
-typedef struct displat_driver_s{
+typedef struct display_driver_s{
     display_screen_off_t ApagoPantalla;
     display_segments_on_t PrendoSegmentos;
     display_digit_on_t PrendoDigito;
-}const * const displat_driver_t;
+}const * const display_driver_t;
 
 /* === Private data type declarations ========================================================== */
 
-struct display_s{
-    uint8_t digitos;
-    uint8_t digito_activo;
-    uint8_t memory[DISPLAY_MAX_DIGITS];
-    struct display_driver_s driver[1];
-}
+
 
 /* === Public variable declarations =========================================================== */
 
-display_t DisplayCreate(uint8_t digits, displat_driver_t driver);
+display_t DisplayCreate(uint8_t digits, display_driver_t driver);
 
 
 void DisplayWriteBCD(display_t display, uint8_t * number, uint8_t size);

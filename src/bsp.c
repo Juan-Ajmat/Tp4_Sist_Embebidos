@@ -44,7 +44,71 @@
 
 static struct board_s board ={0};
 
+
+void KeysInit(void){
+    Chip_SCU_PinMuxSet(KEY_F1_PORT, KEY_F1_PIN, SCU_MODE_UNBUFF_EN | SCU_MODE_PULLUP | KEY_F1_FUNC);
+    board.set_time=DigitalInputCreate(KEY_F1_GPIO, KEY_F1_BIT, false);
+
+    Chip_SCU_PinMuxSet(KEY_F2_PORT, KEY_F2_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F2_FUNC);
+    board.set_alarm = DigitalInputCreate(KEY_F2_GPIO,1,KEY_F2_BIT, false);
+
+    Chip_SCU_PinMuxSet(KEY_F3_PORT, KEY_F3_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F3_FUNC);
+    board.decrement = DigitalInputCreate(KEY_F3_GPIO,1,KEY_F3_BIT, false);
+
+    Chip_SCU_PinMuxSet(KEY_F4_PORT, KEY_F4_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F4_FUNC);
+    board.increment = DigitalInputCreate(KEY_F4_GPIO,1,KEY_F4_BIT, false);
+
+}
+
+
+
+void BuzzerInit(void){
+
+    Chip_SCU_PinMuxSet(BUZZER_PORT, BUZZER_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | BUZZER_FUNC);
+    board.Buzzer = DigitalOutput_Create(BUZZER_GPIO, BUZZER_BIT);
+
+}
+
+void ScreenTurnOff(void){
+
+    Chip_GPIO_ClearValue(LPC_GPIO_PORT, DIGITS_GPIO, DIGITS_MASK);
+    Chip_GPIO_ClearValue(LPC_GPIO_PORT, SEGMENTS_GPIO, SEGMENTS_MASK);
+    Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_P_GPIO, SEGMENT_P_BIT, false);
+}
+
+
+void SegmentsTurnOn(uint8_t segments){
+
+    Chip_GPIO_SetValue(LPC_GPIO_PORT,SEGMENTS_GPIO, (segments) & SEGMENTS_MASK);
+    Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_P_GPIO, SEGMENT_P_BIT, (segments & SEGMENT_P));      
+}
+
+
+
+void DigitTurnOn(uint8_t digit){
+
+    Chip_GPIO_SetValue(LPC_GPIO_PORT,DIGITS_GPIO, (1 << (3 - (digit))) & DIGITS_MASK);       
+
+}
+
+
 board_t BoardCreate(void){
+    DigitsInit();
+    SegmentsInit();
+    BuzzerInit();
+    KeysInit();
+
+    board.display = DisplayCreate(4, &(struct display_driver_s)
+    {
+        .ScreenTurnOff  =   ScreenTurnOff,
+        .SegmentsTurnOn =   SegmentsTurnOn,
+        .DigitTurnOn  =   DigitTurnOn 
+    });
+    return &board;
+}
+
+
+/* board_t BoardCreate(void){
 
     Chip_SCU_PinMuxSet(LED_R_PORT, LED_R_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_INACT | LED_R_FUNC);
     Chip_GPIO_SetPinState(LPC_GPIO_PORT, LED_R_GPIO, LED_R_BIT, false);
@@ -97,4 +161,4 @@ board_t BoardCreate(void){
 
 
     return &board;
-}
+}*/

@@ -44,7 +44,7 @@
 #include <stdbool.h>
 #include "bsp.c"
 #include "digital.h"
-#include "chip.h"
+
 
 /* === Macros definitions ====================================================================== */
 
@@ -62,34 +62,22 @@
 
 /* === Public function implementation ========================================================= */
 
+
+
 int main(void) {
 
-    int divisor = 0;
     board_t board = BoardCreate();
 
+    SisTick_Init(1000);
     while (true) {
 
-        if (DigitalInput_GetState(board->boton_prueba)) {
-            DigitalOutput_Activate(board->Led_azul);
-        } else {
-            DigitalOutput_Desactivate(board->Led_azul);
-        }
+    if(DigitalInput_HasActivate(board->accept)){
+        DisplayWriteBCD(board->display, (uint8_t[]){1,2,3,4},4)
+    }   
 
-        if (DigitalInput_HasActivate(board->boton_cambiar)){
-            DigitalOutput_Toggle(board->Led_amarillo);
-        }
-
-        if (DigitalInput_GetState(board->boton_prender)){
-            DigitalOutput_Activate(board->Led_rojo);
-        }
-
-        if (DigitalInput_GetState(board->boton_apagar)){
-            DigitalOutput_Desactivate(board->Led_rojo);
-        }
-
-
-    
-
+    if(DigitalInput_HasActivate(board->cancel)){
+        DisplayWriteBCD(board->display, NULL, 0);
+    }
 
         divisor++;
         if (divisor == 5) {
@@ -107,6 +95,9 @@ int main(void) {
         }
     }
 
+void SysTick_Handler(void){
+    DisplayRefresh(board->display);
+}
 
 /* === End of documentation ==================================================================== */
 
